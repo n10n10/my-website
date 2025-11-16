@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中美M2分析信息图</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            background-color: #F8F9FA;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+        .header-blue {
+            color: #003366;
+        }
+    </style>
+    <!-- Chosen Palette: Brilliant Blues (#003366, #007BFF, #E6F2FF) with Energetic & Playful Pink (#FF6B6B) for contrast. -->
+    <!-- Narrative Plan: A top-to-bottom scrolling infographic. It starts by validating the user's core question (the M2/GDP disparity) with a chart. Then, it explains this disparity through two key factors (Financial Structure, Savings), each with its own visualization. Finally, it addresses the user's second question about COVID-era policy by presenting two more charts (M2 Growth, CB Balance Sheet) to reveal the true policy stance, followed by a summary conclusion. -->
+    <!-- Visualization Choices:
+        1. M2/GDP Disparity -> Goal: Change -> Viz: Line Chart (Chart.js) -> Justification: Clearly shows the diverging trend over time.
+        2. Financial Structure -> Goal: Organize -> Viz: HTML/CSS Diagram (Tailwind) -> Justification: Visually explains the two different processes (indirect vs. direct).
+        3. Financial Structure Stats -> Goal: Compare -> Viz: Grouped Bar Chart (Chart.js) -> Justification: Quantifies the structural difference shown in the diagram.
+        4. Savings Rate -> Goal: Compare -> Viz: Bar Chart (Chart.js) -> Justification: Simple, clear comparison of a key supporting factor.
+        5. M2 Growth (COVID) -> Goal: Compare/Change -> Viz: Line Chart (Chart.js) -> Justification: Shows the "rate of change" which is the correct metric to compare, not absolute M2.
+        6. CB Balance Sheet (COVID) -> Goal: Compare/Change -> Viz: Line Chart (Chart.js) -> Justification: Directly addresses the user's question about balance sheets and policy tools.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="text-gray-800">
+
+    <header class="text-center my-10 px-4">
+        <h1 class="text-3xl md:text-5xl font-bold header-blue mb-4">解构M2：中美货币机制对比</h1>
+        <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+            为什么中国的M2总量超过美国，而GDP却相反？这篇信息图将为您揭示数据背后的结构性差异。
+        </p>
+    </header>
+
+    <main class="max-w-5xl mx-auto p-4">
+
+        <section class="card">
+            <h2 class="text-2xl font-semibold header-blue mb-4">1. 核心困惑：M2/GDP的巨大差异</h2>
+            <p class="text-gray-700 leading-relaxed mb-6">
+                您的观察是准确的。中国经济的“货币化”程度（以M2/GDP比率衡量）远高于美国，并且这一差距在持续扩大。这直观地体现在图表上，是所有疑问的起点。
+            </p>
+            <h3 class="text-xl font-semibold text-center text-gray-800 mb-4">M2/GDP 比率趋势 (2000-2023)</h3>
+            <div class="chart-container">
+                <canvas id="m2GdpRatioChart"></canvas>
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-2">中国的M2/GDP比率（约210%）远超美国（约90%）。</p>
+        </section>
+
+        <section class="card">
+            <h2 class="text-2xl font-semibold header-blue mb-4">2. 关键因素一：金融结构的根本不同</h2>
+            <p class="text-gray-700 leading-relaxed mb-6">
+                高M2/GDP比率并非简单的“货币超发”，而是两国金融体系“派生”货币方式不同的直接结果。中国以银行贷款（间接融资）为主，而美国以资本市场（直接融资）为主。
+            </s>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="border border-pink-300 p-4 rounded-lg text-center bg-pink-50">
+                    <h3 class="text-lg font-semibold text-pink-700 mb-3">中国：间接融资 (创造M2)</h3>
+                    <p class="text-sm text-gray-600 mb-4">银行贷款会“派生”出新的存款，计入M2。</p>
+                    <div class="text-lg font-mono text-pink-900">
+                        <span class="block mb-2 p-2 bg-white rounded shadow-sm">企业贷款 100万</span>
+                        <span class="block text-pink-600 text-3xl">&darr;</span>
+                        <span class="block mb-2 p-2 bg-white rounded shadow-sm">银行账户新增 100万 存款 (M2)</span>
+                    </div>
+                </div>
+                <div class="border border-blue-300 p-4 rounded-lg text-center bg-blue-50">
+                    <h3 class="text-lg font-semibold text-blue-700 mb-3">美国：直接融资 (不创造M2)</h3>
+                    <p class="text-sm text-gray-600 mb-4">企业发债或IPO，只是M2的“转移”。</p>
+                    <div class="text-lg font-mono text-blue-900">
+                        <span class="block mb-2 p-2 bg-white rounded shadow-sm">投资者A (-100万 M2)</span>
+                        <span class="block text-blue-600 text-3xl">&darr;</span>
+                        <span class="block p-2 bg-white rounded shadow-sm">企业B (+100万 M2)</span>
+                        <span class="block mt-2 text-sm text-gray-600">M2总量不变</span>
+                    </div>
+                </div>
+            </div>
+            <h3 class="text-xl font-semibold text-center text-gray-800 mb-4">金融结构对比 (占GDP比重)</h3>
+            <div class="chart-container">
+                <canvas id="finStructureChart"></canvas>
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-2">中国的银行总资产规模庞大，而美国的资本市场规模庞大。</p>
+        </section>
+
+        <section class="card">
+            <h2 class="text-2xl font-semibold header-blue mb-4">3. 关键因素二：高国民储蓄率</h2>
+            <p class="text-gray-700 leading-relaxed mb-6">
+                中国拥有全球最高水平的国民储蓄率。居民和企业倾向于将资金存入银行，这为银行提供了巨额的存款（M2）来源，并反过来支持了银行的贷款扩张。
+            </p>
+            <h3 class="text-xl font-semibold text-center text-gray-800 mb-4">国民储蓄率对比 (占GDP比重)</h3>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="savingsRateChart"></canvas>
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-2">中国的高储蓄率（约45%）远高于美国（约18%）和世界平均水平。</p>
+        </section>
+
+        <section class="card">
+            <h2 class="text-2xl font-semibold header-blue mb-4">4. 解惑：Covid时期的“放水”之谜</h2>
+            <p class="text-gray-700 leading-relaxed mb-6">
+                您关于Covid时期的观察（美国更宽松，中国更克制）是正确的。之所以M2总量没体现，是因为我们不应看M2的“绝对存量”，而应看“增长率”和“央行政策工具”。
+            </p>
+            
+            <h3 class="text-xl font-semibold text-center text-gray-800 mb-4">真相一：M2 “增长率” (YoY)</h3>
+            <p class="text-gray-700 leading-relaxed mb-6 text-center">
+                M2增长率清晰地显示了美国的政策在2020-2021年是多么激进。
+            </p>
+            <div class="chart-container">
+                <canvas id="m2GrowthChart"></canvas>
+            </div>
+            
+            <h3 class="text-xl font-semibold text-center text-gray-800 mt-12 mb-4">真相二：央行 “资产负债表” (占GDP比重)</h3>
+            <p class="text-gray-700 leading-relaxed mb-6">
+                这揭示了两者工具的不同。美国（FED）通过“量化宽松”(QE)直接扩表来放水。而中国（PBOC）则通过“降准”和“降息”等工具，鼓励商业银行放贷，央行自身并未大幅扩表。因此，中国央行资产负债表/GDP比率下降，并不代表“紧缩”，只是工具不同。
+            </p>
+            <div class="chart-container">
+                <canvas id="cbBalanceSheetChart"></canvas>
+            </div>
+        </section>
+
+        <section class="card" style="background-color: #003366; color: #FFFFFF;">
+            <h2 class="text-2xl font-semibold text-center mb-6">结论：数据背后的经济逻辑</h2>
+            <ul class="list-disc list-inside space-y-3 text-lg">
+                <li>
+                    <strong>结构问题，而非“超发”问题：</strong>
+                    中国的高M2/GDP比率，是其以银行为主导的“间接融资”金融结构和高储蓄率的必然结果。
+                </li>
+                <li>
+                    <strong>存量 vs 增量：</strong>
+                    M2“存量”高是历史和结构问题；M2“增长率”才反映了近期的政策松紧。
+                </li>
+                <li>
+                    <strong>工具不同，而非松紧倒挂：</strong>
+                    Covid期间，美国（FED）通过“扩表”放水，中国（PBOC）通过“降准/降息”放水。两者都在宽松，但工具不同，导致央行资产负债表表现截然相反。
+                </li>
+            </ul>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const chartColors = {
+                china: '#FF6B6B',
+                us: '#007BFF',
+                chinaBg: 'rgba(255, 107, 107, 0.2)',
+                usBg: 'rgba(0, 123, 255, 0.2)',
+                world: '#6c757d'
+            };
+
+            Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif';
+            Chart.defaults.plugins.legend.position = 'bottom';
+            Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            Chart.defaults.plugins.tooltip.titleFont = { size: 14, weight: 'bold' };
+            Chart.defaults.plugins.tooltip.bodyFont = { size: 12 };
+            Chart.defaults.plugins.tooltip.padding = 10;
+            Chart.defaults.plugins.tooltip.cornerRadius = 4;
+            
+            const mandatoryTooltipOptions = {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                  return label.join(' ');
+                                } else {
+                                  return label;
+                                }
+                            },
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(1) + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            };
+
+            const commonLineOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                tension: 0.1,
+                scales: {
+                    y: {
+                        ticks: { callback: value => value + '%' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                ...mandatoryTooltipOptions
+            };
+
+            const commonBarOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: value => value + '%' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                ...mandatoryTooltipOptions
+            };
+
+            new Chart(document.getElementById('m2GdpRatioChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['2000', '2005', '2010', '2015', '2020', '2023'],
+                    datasets: [
+                        {
+                            label: '中国 M2/GDP',
+                            data: [134, 152, 179, 202, 208, 212],
+                            borderColor: chartColors.china,
+                            backgroundColor: chartColors.chinaBg,
+                            fill: true,
+                        },
+                        {
+                            label: '美国 M2/GDP',
+                            data: [59, 61, 86, 88, 105, 90],
+                            borderColor: chartColors.us,
+                            backgroundColor: chartColors.usBg,
+                            fill: true,
+                        }
+                    ]
+                },
+                options: commonLineOptions
+            });
+
+            new Chart(document.getElementById('finStructureChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['中国', '美国'],
+                    datasets: [
+                        {
+                            label: '银行总资产 (占GDP比重)',
+                            data: [280, 110],
+                            backgroundColor: chartColors.china,
+                        },
+                        {
+                            label: '股市+债市总市值 (占GDP比重)',
+                            data: [130, 350],
+                            backgroundColor: chartColors.us,
+                        }
+                    ]
+                },
+                options: commonBarOptions
+            });
+
+            new Chart(document.getElementById('savingsRateChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['中国', '美国', '世界平均'],
+                    datasets: [
+                        {
+                            label: '国民储蓄率 (占GDP比重)',
+                            data: [45.5, 18.2, 26.5],
+                            backgroundColor: [chartColors.china, chartColors.us, chartColors.world],
+                        }
+                    ]
+                },
+                options: { ...commonBarOptions, plugins: { ...mandatoryTooltipOptions.plugins, legend: { display: false } } }
+            });
+
+            new Chart(document.getElementById('m2GrowthChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+                    datasets: [
+                        {
+                            label: '中国 M2 (YoY)',
+                            data: [8.7, 10.1, 8.5, 11.8, 10.0, 8.3],
+                            borderColor: chartColors.china,
+                            backgroundColor: chartColors.chinaBg,
+                        },
+                        {
+                            label: '美国 M2 (YoY)',
+                            data: [5.5, 19.3, 26.9, 5.7, -2.4, -1.8],
+                            borderColor: chartColors.us,
+                            backgroundColor: chartColors.usBg,
+                        }
+                    ]
+                },
+                options: commonLineOptions
+            });
+
+            new Chart(document.getElementById('cbBalanceSheetChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['2019', '2020', '2021', '2022', '2023', '2024'],
+                    datasets: [
+                        {
+                            label: '中国 (PBOC) 占GDP',
+                            data: [35.2, 34.5, 31.8, 30.5, 28.9, 28.5],
+                            borderColor: chartColors.china,
+                            backgroundColor: chartColors.chinaBg,
+                        },
+                        {
+                            label: '美国 (FED) 占GDP',
+                            data: [19.2, 34.8, 39.7, 35.8, 30.1, 28.0],
+                            borderColor: chartColors.us,
+                            backgroundColor: chartColors.usBg,
+                        }
+                    ]
+                },
+                options: commonLineOptions
+            });
+        });
+    </script>
+</body>
+</html>
